@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<!--[if lt IE 7]>      <html class="no-js lt-ie9 lt-ie8 lt-ie7"> <![endif]-->
+<!--[if IE 7]>         <html class="no-js lt-ie9 lt-ie8"> <![endif]-->
+<!--[if IE 8]>         <html class="no-js lt-ie9"> <![endif]-->
+<!--[if gt IE 8]>      <html class="no-js"> <!--<![endif]-->
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <title></title>
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link rel="stylesheet" href="./styles.css">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" integrity="sha512-Fo3rlrZj/k7ujTnHg4CGR2D7kSs0v4LLanw2qksYuRlEzO+tcaEPQogQ0KaoGN26/zrn20ImR1DfuLWnOo7aBA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <body>
+        <!--[if lt IE 7]>
+            <p class="browsehappy">You are using an <strong>outdated</strong> browser. Please <a href="#">upgrade your browser</a> to improve your experience.</p>
+        <![endif]-->
+        <div class="container">
+            <div class="tools">
+                <div data-tool="pencilTool" class="tools__pencil"><i class="fas fa-pencil-alt"></i></div>
+                <div data-tool="brushTool" class="tools__brush"><i class="fas fa-paint-brush"></i></div>
+                <div data-tool="lineTool" class="tools__line"><i class="fas fa-grip-lines"></i></div>
+                <div class="tools__text"><i class="fas fa-text-width"></i></div>
+                <div data-tool="shadowTool" class="tools__shadow"><img src="./assets/icons/ball-outline-with-shadow-at-the-edge.png" alt=""></div>
+                <div class="tools__fill"><i class="fas fa-fill-drip"></i></div>
+                <div class="tools__gradient"><img src="./assets/icons/gradient.png" alt=""></div>
+                <div class="tools__active-tool"><i class="fas fa-tools"></i></div>
+                <div class="tools__alpha"><i class="fas fa-font"></i></div>
+                <div class="tools__canvas-size"><i class="far fa-copy"></i></div>
+                <div class="tools__stroke-color"><div></div></div>
+                <div class="tools__colors">
+                    <div class="tools__active-color">
+                        <input type="color" name="" id="">
+                    </div>
+                    <div class="tools__second-color">
+                        <input type="color" name="" id="">
+                    </div>
+                </div>
+            </div>
+            <canvas id="ctx" width="1266" height="768"></canvas>
+        </div>
+        <script src="./app.js" async defer></script>
+    </body>
+</html>

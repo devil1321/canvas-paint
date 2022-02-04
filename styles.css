@@ -1,0 +1,162 @@
+* {
+  margin: 0px;
+  padding: 0px;
+  font-family: Verdana, Geneva, Tahoma, sans-serif;
+}
+
+.container {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-pack: start;
+      -ms-flex-pack: start;
+          justify-content: flex-start;
+  -webkit-box-align: start;
+      -ms-flex-align: start;
+          align-items: flex-start;
+}
+
+.tools {
+  width: 90px;
+  height: 100%;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-pack: space-evenly;
+      -ms-flex-pack: space-evenly;
+          justify-content: space-evenly;
+  -webkit-box-align: start;
+      -ms-flex-align: start;
+          align-items: flex-start;
+  -ms-flex-wrap: wrap;
+      flex-wrap: wrap;
+  background-color: white;
+}
+
+.tools div {
+  width: 25px;
+  height: 20px;
+  cursor: pointer;
+  margin: 2px;
+  text-align: center;
+  font-weight: bold;
+  text-transform: uppercase;
+  width: 42%;
+  padding: 10px 0px;
+  border: 1px solid black;
+  -webkit-transition: all 0.1s ease-in-out;
+  transition: all 0.1s ease-in-out;
+}
+
+.tools div:hover {
+  background-color: #f7f7f7;
+  border: 1px solid red;
+  -webkit-transform: scale(1.1);
+          transform: scale(1.1);
+}
+
+.tools div img {
+  width: 49%;
+  pointer-events: none;
+}
+
+.tools div i {
+  pointer-events: none;
+}
+
+.tools__stroke-color {
+  min-width: 95%;
+  height: 10px !important;
+  overflow: hidden;
+}
+
+.tools__stroke-color div {
+  position: relative;
+  top: -35px;
+  left: -5px;
+  width: 120px;
+  border: 0px;
+  border-bottom: 2px solid red;
+  -webkit-transform: rotate(15deg);
+          transform: rotate(15deg);
+}
+
+.tools__stroke-color:hover {
+  background-color: white !important;
+  border: 1px solid black !important;
+  -webkit-transform: scale(1) !important;
+          transform: scale(1) !important;
+}
+
+.tools__colors {
+  position: relative;
+  top: 0px;
+  left: 0px;
+  min-width: 95%;
+  height: 50px !important;
+}
+
+.tools__colors:hover {
+  background-color: white !important;
+  border: 1px solid black !important;
+  -webkit-transform: scale(1) !important;
+          transform: scale(1) !important;
+}
+
+.tools__colors div {
+  width: -webkit-fit-content !important;
+  width: -moz-fit-content !important;
+  width: fit-content !important;
+  height: -webkit-fit-content !important;
+  height: -moz-fit-content !important;
+  height: fit-content !important;
+  border: 0px;
+  -webkit-transition: all 0.1s ease-in-out;
+  transition: all 0.1s ease-in-out;
+  -webkit-transform: scale(1) !important;
+          transform: scale(1) !important;
+  background-color: transparent !important;
+  border: 1px solid transparent !important;
+}
+
+.tools__colors div input {
+  cursor: pointer;
+  min-width: 40px;
+  max-width: 40px;
+  min-height: 40px;
+  border: 0px;
+  background-color: transparent;
+  -webkit-transition: all 0.1s ease-in-out;
+  transition: all 0.1s ease-in-out;
+}
+
+.tools__colors div input:hover {
+  -webkit-transform: scale(1.1);
+          transform: scale(1.1);
+}
+
+.tools__colors div:hover {
+  -webkit-transform: scale(1) !important;
+          transform: scale(1) !important;
+  background-color: transparent !important;
+  border: 1px solid transparent !important;
+}
+
+.tools__colors div:first-of-type {
+  position: absolute;
+  top: -5px;
+  left: 10px;
+  z-index: 2;
+}
+
+.tools__colors div:last-of-type {
+  position: absolute;
+  top: 5px;
+  left: 30px;
+  z-index: 1;
+}
+
+canvas {
+  border-left: 1px solid lightgray;
+}
+/*# sourceMappingURL=styles.css.map */
