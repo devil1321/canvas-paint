@@ -122,6 +122,19 @@
   font-size: 0.6rem;
 }
 
+.tools__tooltip.--show {
+  top: 50px !important;
+  left: 45px !important;
+  opacity: 1 !important;
+  min-width: 40px;
+  width: 40px;
+  max-width: 40px;
+}
+
+.tools__tooltip.--show .tools__tooltip-triangle {
+  left: 15px;
+}
+
 .tools__tooltip-left {
   position: absolute;
   top: 8px;
@@ -176,10 +189,6 @@
 
 .tools__circle .circle:hover {
   border: 1px solid black !important;
-}
-
-.tools__rubber {
-  min-width: 95%;
 }
 
 .tools__active-tool {
@@ -319,11 +328,27 @@
   z-index: 1;
 }
 
+.tools__canvas-size-range:first-of-type .tools__tooltip.--show {
+  top: 80px !important;
+  left: 45px !important;
+}
+
+.tools__canvas-size-range:last-of-type .tools__tooltip.--show {
+  top: 80px !important;
+  left: 5px !important;
+}
+
+.tools__canvas-color-picker i {
+  pointer-events: none;
+}
+
 .tools__canvas-color-picker input {
   opacity: 0;
-  position: relative;
-  top: -20px;
-  left: 0px;
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  width: 20px;
+  height: 20px;
 }
 
 .tools__wide-tool-range {
@@ -437,6 +462,13 @@
   position: absolute;
   top: 50px;
   opacity: 0;
+}
+
+.tools__alpha .tools__tooltip-left, .tools__rubber .tools__tooltip-left {
+  left: 60px !important;
+  min-width: -webkit-fit-content !important;
+  min-width: -moz-fit-content !important;
+  min-width: fit-content !important;
 }
 
 .tools__linear-gradient > div:first-of-type, .tools__radial-gradient > div:first-of-type {

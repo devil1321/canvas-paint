@@ -19,14 +19,17 @@
         <div class="container">
             <div class="tools-wrapper">
             <div class="tools">
-               
-                <div data-id="menu-1" data-tool="canvasTool" class="tools__canvas-size">
+                <div data-id="menu-1"  data-tool="CanvasTool" data-action="canvasTool" class="tools__canvas-size">
                     <i class="far fa-copy"></i>
                     <div id="menu-1" class="tools__menu">
                         <div>
                             <i class="fas fa-ruler-horizontal"></i>
                             <div class="tools__canvas-size-range">
-                                <input type="range" name="" id="">
+                                <input type="range" name="" id="" min="0" max="1920">
+                                <div class="tools__tooltip --show">
+                                    <div class="tools__tooltip-triangle"></div>
+                                    <div class="tools__tooltip-content">0</div>
+                                </div>
                             </div>
                             <div class="tools__tooltip">
                                 <div class="tools__tooltip-triangle"></div>
@@ -38,12 +41,17 @@
                         <div>
                             <i class="fas fa-ruler-vertical"></i>
                             <div class="tools__canvas-size-range">
-                                <input type="range" name="" id="">
+                                <input type="range" name="" id="" min="0" max="1080">
+                                <div class="tools__tooltip --show">
+                                    <div class="tools__tooltip-triangle"></div>
+                                    <div class="tools__tooltip-content">0</div>
+                                </div>
                             </div>
                             <div class="tools__tooltip">
                                 <div class="tools__tooltip-triangle"></div>
                                 <div class="tools__tooltip-content">Canvas Height</div>
                             </div>
+                           
                         </div>
                         <div>
                             <div class="tools__canvas-color-picker">
@@ -54,7 +62,7 @@
                                 <div class="tools__tooltip-content">Canvas Color</div>
                             </div>
                         </div>
-                        <div>
+                        <div class="tools__clear-canvas">
                             <i class="fas fa-broom"></i>
                             <div class="tools__tooltip">
                                 <div class="tools__tooltip-triangle"></div>
@@ -65,11 +73,15 @@
                         </div>
                     </div>
                 </div>
-                <div data-id="menu-2" data-tool="wideTool" class="tools__wide">
+                <div data-id="menu-2"  data-tool="WideTool" data-action="wideTool" class="tools__wide">
                     <i class="fas fa-arrows-alt-h"></i>
                     <div id="menu-2" class="tools__menu">
                        <div class="tools__wide-tool-range">
-                           <input type="range" name="" id="">
+                           <input type="range" name="" id="" min="0" max="100">
+                           <div class="tools__tooltip --show">
+                                <div class="tools__tooltip-triangle"></div>
+                                <div class="tools__tooltip-content">0</div>
+                            </div>
                            <div class="tools__tooltip">
                                 <div class="tools__tooltip-triangle"></div>
                                 <div class="tools__tooltip-content">Wide</div>
@@ -77,7 +89,7 @@
                         </div>
                     </div>
                 </div>
-                <div data-id="menu-3" data-tool="squareTool" class="tools__square">
+                <div data-id="menu-3"  data-tool="SquareTool" data-action="squareTool" class="tools__square">
                     <div class="square"></div>
                     <div id="menu-3" class="tools__menu">
                         <div>
@@ -101,7 +113,7 @@
                         </div>
                     </div>
                 </div>
-                <div data-id="menu-4" data-tool="circleTool" class="tools__circle">
+                <div data-id="menu-4"  data-tool="CircleTool" data-action="circleTool" class="tools__circle">
                     <div class="circle"></div>
                     <div id="menu-4" class="tools__menu">
                         <div>
@@ -125,55 +137,55 @@
                         </div>
                     </div>
                 </div>
-                <div data-id="menu-5" data-tool="pencilTool" class="tools__pencil">
+                <div data-id="menu-5"  data-tool="PencilTool" data-action="pencilTool" class="tools__pencil">
                     <i class="fas fa-pencil-alt"></i>
                     <div id="menu-5" class="tools__menu">
                         <div>
                             <div class="tools__pencil-square"></div>
                             <div class="tools__tooltip">
                                 <div class="tools__tooltip-triangle"></div>
-                                <div class="tools__tooltip-content">Width</div>
+                                <div class="tools__tooltip-content">Square</div>
                             </div></div>
                         <div>
                             <div class="tools__pencil-round"></div>
                             <div class="tools__tooltip">
                                 <div class="tools__tooltip-triangle"></div>
-                                <div class="tools__tooltip-content">Width</div>
+                                <div class="tools__tooltip-content">Round</div>
                             </div></div>
                         <div>
                             <div class="tools__pencil-lazy"></div>
                             <div class="tools__tooltip">
                                 <div class="tools__tooltip-triangle"></div>
-                                <div class="tools__tooltip-content">Width</div>
+                                <div class="tools__tooltip-content">Lazy</div>
                             </div>
                         </div>
                     </div>
                 </div>
-                <div data-id="menu-6" data-tool="brushTool" class="tools__brush">
+                <div data-id="menu-6"  data-tool="BrushTool" data-action="brushTool" class="tools__brush">
                     <i class="fas fa-paint-brush"></i>
                     <div id="menu-6" class="tools__menu">
                         <div>
                             <div class="tools__brush-square"></div>
                             <div class="tools__tooltip">
                                 <div class="tools__tooltip-triangle"></div>
-                                <div class="tools__tooltip-content">Width</div>
+                                <div class="tools__tooltip-content">Square</div>
                             </div></div>
                         <div>
                             <div class="tools__brush-round"></div>
                             <div class="tools__tooltip">
                                 <div class="tools__tooltip-triangle"></div>
-                                <div class="tools__tooltip-content">Width</div>
+                                <div class="tools__tooltip-content">Round</div>
                             </div></div>
                         <div>
                             <div class="tools__brush-lazy"></div>
                             <div class="tools__tooltip">
                                 <div class="tools__tooltip-triangle"></div>
-                                <div class="tools__tooltip-content">Width</div>
+                                <div class="tools__tooltip-content">Lazy</div>
                             </div>
                         </div>
                     </div>
                 </div>
-                <div data-id="menu-7" data-tool="lineTool" class="tools__line">
+                <div data-id="menu-7"  data-tool="LineTool" data-action="lineTool" class="tools__line">
                     <i class="fas fa-grip-lines"></i>
                     <div id="menu-7" class="tools__menu">
                         <div>
@@ -191,7 +203,7 @@
                         </div>
                     </div>
                 </div>
-                <div data-id="menu-8" data-tool="textTool" class="tools__text">
+                <div data-id="menu-8"  data-tool="TextTool" data-action="textTool" class="tools__text">
                     <i class="fas fa-text-width"></i>
                     <div id="menu-8" class="tools__menu">
                         <div>
@@ -245,28 +257,26 @@
                         </div>
                     </div>
                 </div>
-                <div data-id="menu-9" data-tool="shadowTool" class="tools__shadow">
-                    <img src="./assets/icons/ball-outline-with-shadow-at-the-edge.png" alt="">
+                <div data-id="menu-9"  data-tool="PathTool" data-action="pathTool" class="tools__pencil">
+                    <img src="./assets/icons/openpath.svg" alt="">
                     <div id="menu-9" class="tools__menu">
                         <div>
-                            <i class="fas fa-tint"></i>
-                            <input type="color" name="" id="">
+                            <img src="./assets/icons/openpath.svg" alt="">
                             <div class="tools__tooltip">
                                 <div class="tools__tooltip-triangle"></div>
-                                <div class="tools__tooltip-content">Color</div>
-                            </div>
-                        </div>
+                                <div class="tools__tooltip-content">Open</div>
+                            </div></div>
                         <div>
-                            <div class="tools__shadow-blur-icon"></div>
-                            <input class="tools__shadow-size-range" type="range" name="" id="">
+                            <img src="./assets/icons/padlock.svg" alt="">
                             <div class="tools__tooltip">
                                 <div class="tools__tooltip-triangle"></div>
-                                <div class="tools__tooltip-content">Blur</div>
+                                <div class="tools__tooltip-content">Close</div>
                             </div>
                         </div>
+                       
                     </div>
                 </div>
-                <div data-id="menu-10" data-tool="bezierTool" class="tools__bezier">
+                <div data-id="menu-10" data-tool="BezierTool"  data-action="bezierTool" class="tools__bezier">
                     <i class="fas fa-bezier-curve"></i>
                     <div id="menu-10" class="tools__menu">
                         <div>
@@ -285,7 +295,7 @@
                         </div>
                     </div>
                 </div>
-                <div data-id="menu-11" data-tool="gradientTool" class="tools__gradient">
+                <div data-id="menu-11" data-tool="GradientTool"  data-action="gradientTool" class="tools__gradient">
                     <img src="./assets/icons/gradient.png" alt="">
                     <div id="menu-11" class="tools__menu">
                         <div class="tools__linear-gradient">
@@ -307,20 +317,49 @@
                        
                     </div>
                 </div>
-                <div data-id="menu-12" data-tool="aplhaTool" class="tools__alpha">
+                <div data-id="menu-12" data-tool="AplhaTool"  data-action="aplhaTool" class="tools__alpha">
                     <i class="fas fa-font"></i>
                     <div id="menu-12" class="tools__menu">
                         <div class="tools__global-alpha">
-                            <input type="range" name="" id="">
+                            <input type="range" name="" id="" min="0" max="100">
+                            <div class="tools__tooltip --show">
+                                <div class="tools__tooltip-triangle"></div>
+                                <div class="tools__tooltip-content">0</div>
+                            </div>
                             <div class="tools__tooltip">
                                 <div class="tools__tooltip-triangle"></div>
                                 <div class="tools__tooltip-content">Global Alpha</div>
                             </div>
                         </div>
-                       
+                    </div>
+                    <div class="tools__tooltip-left">
+                        <div class="tools__tooltip-triangle"></div>
+                        <div class="tools__tooltip-content">Aplha</div>
+                    </div>
+                   
+                </div>
+                <div data-id="menu-13" data-tool="ShadowTool"  data-action="shadowTool" class="tools__shadow">
+                    <img src="./assets/icons/ball-outline-with-shadow-at-the-edge.png" alt="">
+                    <div id="menu-13" class="tools__menu">
+                        <div>
+                            <i class="fas fa-tint"></i>
+                            <input type="color" name="" id="">
+                            <div class="tools__tooltip">
+                                <div class="tools__tooltip-triangle"></div>
+                                <div class="tools__tooltip-content">Color</div>
+                            </div>
+                        </div>
+                        <div>
+                            <div class="tools__shadow-blur-icon"></div>
+                            <input class="tools__shadow-size-range" type="range" name="" id="">
+                            <div class="tools__tooltip">
+                                <div class="tools__tooltip-triangle"></div>
+                                <div class="tools__tooltip-content">Blur</div>
+                            </div>
+                        </div>
                     </div>
                 </div>
-                <div data-tool="rubberTool" class="tools__rubber">
+                <div data-tool="rubberTool" data-tool="RubberTool"  data-action="rubberTool" class="tools__rubber">
                     <i class="fas fa-eraser"></i>
                         <div class="tools__tooltip-left">
                             <div class="tools__tooltip-triangle"></div>
