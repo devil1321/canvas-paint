@@ -38,20 +38,22 @@ function UI_ACTIONS(){
     }
     function SQUARE_TOOL(){
         this.square = document.querySelector('.square')
-        this.lineJoinItems = document.querySelectorAll('.tools__line-join')
     }
     
     function CIRCLE_TOOL(){
         this.circle = document.querySelector('.circle')
     }
     function PENCIL_TOOL(){
-        this.pencil = document.querySelector('.tools__pencil')
+        this.pencils = document.querySelectorAll('.tools__pencil .tools__menu > div')
     }
     function BRUSH_TOOL(){
-        this.brush = document.querySelector('.tools__brush')
+        this.brushes = document.querySelectorAll('.tools__brush .tools__menu > div')
+
     }
     function LINE_TOOL(){
         this.line = document.querySelector('.tools__line')
+        this.lineJoinItems = document.querySelectorAll('.tools__line-join')
+
     }
     function TEXT_TOOL(){}
     function PATH_TOOL(){}
@@ -247,6 +249,8 @@ function TOOLS_ACTIONS(){
     function STYLES(){
         this.lineWidth = 10
         this.lineJoin = 'square'
+        this.pencilLineCap = 'square'
+        this.brushLineCap = 'square'
         this.shadowColor = 'red'
         this.shadowBlur = 10
         this.strokeColor = '#000000'
@@ -435,25 +439,31 @@ function TOOLS_ACTIONS(){
         }    
     }
     function PENCIL_TOOL(){
-        this.square = 'square'
-        this.round = 'round'
+     
         this.blur = '10'
     }
+    PENCIL_TOOL.prototype.setCap = function(e){
+        TOOLS.Styles.pencilLineCap = e.target.dataset.cap
+    }
     PENCIL_TOOL.prototype.pencilTool = function(){
-        CANVAS_DOM.ctx.beginPath()
-        CANVAS_DOM.ctx.lineCap = 'square'
-        CANVAS_DOM.ctx.moveTo(TOOLS.Cords.x1,TOOLS.Cords.y1)
-        CANVAS_DOM.ctx.lineTo(TOOLS.Cords.x1,TOOLS.Cords.y1)
-        CANVAS_DOM.ctx.lineWidth = TOOLS.Styles.wide
+        if(!TOOLS.Controllers.isPath){
+            CANVAS_DOM.ctx.beginPath()
+        }
+        CANVAS_DOM.ctx.lineCap = TOOLS.Styles.pencilLineCap
         CANVAS_DOM.ctx.strokeStyle = TOOLS.Styles.strokeColor
+        CANVAS_DOM.ctx.lineTo(TOOLS.Cords.x1,TOOLS.Cords.y1)
         CANVAS_DOM.ctx.stroke()
+        if(!TOOLS.Controllers.isPath){
+            CANVAS_DOM.ctx.closePath()
+        }
     }
     
     function BRUSH_TOOL(){
-        this.square = 'square'
-        this.round = 'round'
         this.blur = '10'
     }   
+    BRUSH_TOOL.prototype.setCap = function(e){
+        TOOLS.Styles.brushLineCap = e.target.dataset.cap
+    }
     BRUSH_TOOL.prototype.brushTool = function(){
         CANVAS_DOM.ctx.beginPath()
         CANVAS_DOM.ctx.lineCap = 'round'
@@ -467,7 +477,7 @@ function TOOLS_ACTIONS(){
     function LINE_TOOL(){}
     
     LINE_TOOL.prototype.lineTool = function(){
-        CANVAS_DOM.ctx.lineCap = 'round'
+        CANVAS_DOM.ctx.lineCap = 'square'
         // DOM.ctx.lineDashOffset = 24
         CANVAS_DOM.ctx.lineTo(TOOLS.Cords.x1,TOOLS.Cords.y2)
         CANVAS_DOM.ctx.lineWidth = TOOLS.Styles.lineWidth
@@ -518,14 +528,14 @@ function TOOLS_ACTIONS(){
     }
     COLOR_TOOL.prototype.setSwapColors = function(){
         if(!TOOLS.Controllers.swapColors){
-            UI.UI_DOM.firstColorInput.value =  TOOLS.Styles.secondColor
-            UI.UI_DOM.secondColorInput.value =  TOOLS.Styles.firstColor
+            UI.ColorTool.firstColorInput.value =  TOOLS.Styles.secondColor
+            UI.ColorTool.secondColorInput.value =  TOOLS.Styles.firstColor
             CANVAS_DOM.ctx.fillStyle = TOOLS.Styles.secondColor
             CANVAS_DOM.ctxPlaceholder.fillStyle = TOOLS.Styles.secondColor
             TOOLS.Controllers.swapColors = true
         }else{
-            UI.UI_DOM.firstColorInput.value =  TOOLS.Styles.firstColor
-            UI.UI_DOM.secondColorInput.value =  TOOLS.Styles.secondColor
+            UI.ColorTool.firstColorInput.value =  TOOLS.Styles.firstColor
+            UI.ColorTool.secondColorInput.value =  TOOLS.Styles.secondColor
             CANVAS_DOM.ctx.fillStyle = TOOLS.Styles.firstColor
             CANVAS_DOM.ctxPlaceholder.fillStyle = TOOLS.Styles.firstColor
             TOOLS.Controllers.swapColors = false
@@ -566,7 +576,9 @@ window.addEventListener('DOMContentLoaded',()=>{
 CANVAS_DOM.canvas.addEventListener('mousedown',(e)=>{
    CANVAS_DOM.ctxPlaceholder.clearRect(0,0,CANVAS_DOM.canvasPlaceholder.width,CANVAS_DOM.canvasPlaceholder.height)
    TOOLS.Controllers.isActive()
-   TOOLS.Cords.setStartPos(e)
+   if(TOOLS.activeTool === 'pencilTool' || TOOLS.activeTool === 'pencilToolLazy' || TOOLS.activeTool !== 'brushTool' || TOOLS.activeTool !== 'brushToolLazy'){
+       TOOLS.Cords.setStartPos(e)
+   }
    if(TOOLS.activeTool !== 'pathTool'){
        CANVAS_DOM.ctx.moveTo(TOOLS.Cords.x1,TOOLS.Cords.y1)
    }
@@ -581,11 +593,12 @@ CANVAS_DOM.canvas.addEventListener('mouseup',(e)=>{
 
 CANVAS_DOM.canvas.addEventListener('mousemove',(e)=>{
 CANVAS_DOM.ctxPlaceholder.clearRect(0,0,CANVAS_DOM.canvasPlaceholder.width,CANVAS_DOM.canvasPlaceholder.height)
-
+   TOOLS.Cords.setStartPos(e)
+    
     TOOLS.Cords.setEndPos(e)
     TOOLS.Cords.setRadius(e)
     if(TOOLS.Controllers.isPaint){
-        if(TOOLS.Controllers.activeTool !== 'lineTool' && TOOLS.Controllers.activeTool !== 'squareTool' && TOOLS.Controllers.activeTool !== 'circleTool'){
+        if(TOOLS.Controllers.activeTool !== 'lineTool'){
             TOOLS[TOOLS.Controllers.activeTool][TOOLS.Controllers.toolAction]()
         }
     }
@@ -644,12 +657,17 @@ UI.CanvasTool.canvasColor.addEventListener('input',(e)=>TOOLS.CanvasTool.canvasC
 UI.CanvasTool.clearCanvas.addEventListener('click',TOOLS.CanvasTool.canvasClear)
 
 UI.WideTool.wideTool.addEventListener('input',(e)=>TOOLS.WideTool.wideTool(e))
-UI.SquareTool.lineJoinItems.forEach(item => item.addEventListener('click',(e)=>TOOLS.SquareTool.setLineJoin(e)))
+
+UI.PencilTool.pencils.forEach(pencil => pencil.addEventListener('click',(e)=>TOOLS.PencilTool.setCap(e)))
+UI.BrushTool.brushes.forEach(pencil => pencil.addEventListener('click',(e)=>TOOLS.BrushTool.setCap(e)))
+
+
+UI.LineTool.lineJoinItems.forEach(item => item.addEventListener('click',(e)=>TOOLS.SquareTool.setLineJoin(e)))
 
 
 
 UI.StrokeTool.strokeColorInput.addEventListener('input',(e)=>TOOLS.StrokeTool.setStrokeColor(e))
 UI.ColorTool.firstColorInput.addEventListener('input',(e)=>TOOLS.ColorTool.setFirstColor(e))
 UI.ColorTool.secondColorInput.addEventListener('input',(e)=>TOOLS.ColorTool.setSecondColor(e))
-UI.ColorTool.swapBtn.addEventListener('click',()=>TOOLS.setSwapColors())
+UI.ColorTool.swapBtn.addEventListener('click',()=>TOOLS.ColorTool.setSwapColors())
 // Canvas2Image.saveAsPNG(CANVAS_DOM.canvas)
