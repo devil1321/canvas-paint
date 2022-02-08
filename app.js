@@ -1,82 +1,44 @@
 import Canvas2Image from './canvas2image.js'
-// input.addEventListener('blur',(e)=>{console.log(e.target.value)})
 
 function CANVAS_ELEMENTS(){
     this.canvas  = document.getElementById('ctx')
+    this.canvasPlaceholder = document.getElementById('ctx-placeholder')
     this.ctx = this.canvas.getContext('2d')
+    this.ctxPlaceholder = this.canvasPlaceholder.getContext('2d')
 }
 
 const CANVAS_DOM = new CANVAS_ELEMENTS()
 
 function UI_ACTIONS(){
     function CONTROLLERS_ELEMENTS(){
-        this.allToolsIcons = [
-            {
-                id:'canvasTool',
-                icon:'far fa-copy'
-            },
-            {
-                id:'wideTool',
-                icon:'fas fa-arrows-alt-h'
-            },
-            {
-                id:'pencilTool',
-                icon:'fas fa-pencil-alt'
-            },
-            {
-                id:'brushTool',
-                icon:'fas fa-paint-brush'
-            },
-            {
-                id:'lineTool',
-                icon:'fas fa-grip-lines'
-            },
-            {
-                id:'textTool',
-                icon:'fas fa-text-width'
-            },
-            {
-                id:'shadowTool',
-                src:'./assets/icons/ball-outline-with-shadow-at-the-edge.png'
-            },
-            {
-                id:'fillTool',
-                icon:'fas fa-fill-drip'
-            },
-            {
-                id:'gradientTool',
-                src:'./assets/icons/gradient.png'
-            },
-            {
-                id:'aplhaTool',
-                icon:'fas fa-font'
-            },
-            {
-                id:'rubberTool',
-                icon:'fas fa-eraser'
-            }
-        ]
+        this.allToolsIcons = []
     }
     function UI_DOM_ELEMENTS(){
         this.toolsWrapper = document.querySelector('.tools-wrapper')
         this.activeTool = document.querySelector('.tools__active-tool'),
         this.allTools = document.querySelectorAll('.tools > div'),
         this.allMenus = document.querySelectorAll('.tools__menu'),
-        this.allMenusDivs = document.querySelectorAll('.tools__menu div')
+        this.allMenuItems = document.querySelectorAll('.tools__menu > div')
         this.allTooltips = document.querySelectorAll('.tools__tooltip')
         this.allTooltipsLeft = document.querySelectorAll('.tools__tooltip-left')
     }
     function CANVAS_TOOL(){
-        this.canvasWidth = document.querySelector('.tools__canvas-size-range:first-of-type input')
-        this.canvasHeight = document.querySelector('.tools__canvas-size-range:last-of-type input')
-        this.canvasColor = document.querySelector('.tools__canvas-color-picker')
+        this.canvasWidth = document.querySelector('.--canvas-width')
+        this.canvasHeight = document.querySelector('.--canvas-height')
+        this.showWidth = document.querySelector('.--c-width')
+        this.showHeight = document.querySelector('.--c-height')
+        this.canvasColor = document.querySelector('.--canvas-color')
         this.clearCanvas = document.querySelector('.tools__clear-canvas')
         this.squareParent = document.querySelector('.tools__square')
     }
 
-    function WIDE_TOOL(){}
+    function WIDE_TOOL(){
+        this.wideTool = document.querySelector('.--wide-tool')
+        this.showWide = document.querySelector('.--wide-state')
+    }
     function SQUARE_TOOL(){
         this.square = document.querySelector('.square')
+        this.lineJoinItems = document.querySelectorAll('.tools__line-join')
     }
     
     function CIRCLE_TOOL(){
@@ -110,7 +72,10 @@ function UI_ACTIONS(){
         this.swapBtn = document.querySelector('.tools__swap-btn')
 
     }
-
+    function SAVE_TOOL(){
+        this.savePNG = document.querySelector('.tools__save-png')
+        this.saveBMP = document.querySelector('.tools__save-bmp')
+    }
     this.CONTROLLERS = new CONTROLLERS_ELEMENTS()
     this.UI_DOM = new UI_DOM_ELEMENTS()
 
@@ -130,8 +95,15 @@ function UI_ACTIONS(){
     this.RubberTool = new RUBBER_TOOL()
     this.StrokeTool = new STROKE_TOOL()
     this.ColorTool = new COLOR_TOOL()
+    this.SaveTool = new SAVE_TOOL()
 }
 
+UI_ACTIONS.prototype.clickToolPush = function(e){
+    e.target.classList.add('active') 
+}
+UI_ACTIONS.prototype.clickToolRelease = function(e){
+    e.target.classList.remove('active') 
+}
 UI_ACTIONS.prototype.displayTooltip = function(e){
     const tooltip = e.target.querySelector('.tools__tooltip')
     const tooltipLeft = e.target.querySelector('.tools__tooltip-left')
@@ -179,28 +151,54 @@ UI_ACTIONS.prototype.toggleMenuOpen = function(e){
     }
 }
 UI_ACTIONS.prototype.setActiveIcon = function(e){
-    if(e.target.dataset.action){
-        if(e.target.dataset.action === 'gradientTool' || e.target.dataset.action === 'shadowTool'){
-            const  item = UI.CONTROLLERS.allToolsIcons.find(el => el.id === e.target.dataset.action)
-            const img = document.createElement('img')
-            img.src = item.src
-            UI.UI_DOM.activeTool.innerHTML = ''
-            UI.UI_DOM.activeTool.appendChild(img)
-        } else if(e.target.dataset.tool === 'squareTool' ){
-            UI.UI_DOM.activeTool.innerHTML = ''
-            const tempEl = UI.UI_DOM.square.cloneNode(true)
-            UI.UI_DOM.activeTool.appendChild(tempEl)
-
-        } else  if(e.target.dataset.toolAction ==='circleTool'){
-            UI.UI_DOM.activeTool.innerHTML = ''
-            const tempEl = UI.UI_DOM.circle.cloneNode(true)
-            UI.UI_DOM.activeTool.appendChild(tempEl)
-        } else{
-            const item =  UI.CONTROLLERS.allToolsIcons.find(el => el.id === e.target.dataset.action)
-
-            UI.UI_DOM.activeTool.innerHTML = `<i class="${item.icon}"></i>`
+    let target;
+    if(e.target.tagName.toUpperCase() === 'INPUT' && e.target.dataset.tool){
+        target = e.target.parentElement.parentElement
+    }else if(!e.target.dataset.tool){
+        target = e.target.parentElement
+    }
+    else{
+        target = e.target
+    }
+    this.CONTROLLERS.allToolsIcons = []
+    class ICON{
+        constructor(icon,src,node,action){
+            this.icon = icon;
+            this.src = src
+            this.node = node
+            this.action = action
         }
     }
+    const icon = target.querySelector('i')
+    const img = target.querySelector('img')
+    const divIcon = target.querySelector('div:first-child')
+    const action = target.dataset.action
+    if(icon){
+        const iconEL = new ICON(icon.classList.value,null,null,action)
+        this.CONTROLLERS.allToolsIcons.push(iconEL)
+    }else if(img){
+        const iconEL = new ICON(null,img.src,null,action)
+        this.CONTROLLERS.allToolsIcons.push(iconEL)
+    }else if(divIcon){
+        const tempEl = divIcon.cloneNode(true)
+        const iconEL = new ICON(null,null,tempEl,action)
+        this.CONTROLLERS.allToolsIcons.push(iconEL)
+    }
+    if(target.dataset.action){
+        const item =  this.CONTROLLERS.allToolsIcons.find(el => el.action === target.dataset.action)
+        if(item.icon){
+            this.UI_DOM.activeTool.innerHTML = `<i class="${item.icon}"></i>`      
+        }else if(item.src){
+            const img = document.createElement('img')
+            img.src = item.src
+            this.UI_DOM.activeTool.innerHTML = ''
+            this.UI_DOM.activeTool.appendChild(img)
+        }else if(item.node){
+            this.UI_DOM.activeTool.innerHTML = ''
+            const icon = item.node
+            this.UI_DOM.activeTool.appendChild(icon)
+        }
+    } 
 }
 
 const UI = new UI_ACTIONS() 
@@ -211,6 +209,7 @@ function TOOLS_ACTIONS(){
         this.activeTool = 'BrushTool'
         this.toolAction = 'brushTool'
         this.swapColors = false
+        this.isPath = false
 
     }
     CONTROLLERS.prototype.setActiveTool = function(e){
@@ -242,30 +241,198 @@ function TOOLS_ACTIONS(){
         this.x2 = e.clientX - 80
         this.y2 = e.clientY
     }
+    CORDS.prototype.setRadius = function(e){
+        this.r = this.x2 - this.x1
+    }
     function STYLES(){
-        this.wide = 11
+        this.lineWidth = 10
+        this.lineJoin = 'square'
         this.shadowColor = 'red'
         this.shadowBlur = 10
         this.strokeColor = '#000000'
         this.firstColor = '#000000'
         this.secondColor = '#ffffff'
-        this.fillColor = this.firstColor
     }
-    function CANVAS_TOOL(){}
+    function CANVAS_TOOL(){
+    }
+    CANVAS_TOOL.prototype.canvasHeight = function(e){
+        CANVAS_DOM.canvas.height = e.target.value
+        CANVAS_DOM.canvasPlaceholder.height = e.target.value
+        UI.CanvasTool.showHeight.textContent = e.target.value
+    }
+    CANVAS_TOOL.prototype.canvasWidth= function(e){
+        CANVAS_DOM.canvas.width = e.target.value
+        CANVAS_DOM.canvasPlaceholder.width = e.target.value
+        UI.CanvasTool.showWidth.textContent = e.target.value
+
+    }
+    CANVAS_TOOL.prototype.canvasColor = function(e){
+        CANVAS_DOM.ctx.fillRect(0,0,CANVAS_DOM.canvas.width,CANVAS_DOM.canvas.height)
+        CANVAS_DOM.ctx.fillStyle = e.target.value
+    }
+    CANVAS_TOOL.prototype.canvasClear= function(e){
+        CANVAS_DOM.ctx.clearRect(0,0,CANVAS_DOM.canvas.width,CANVAS_DOM.canvas.height)
+    }
+
     function WIDE_TOOL(){}
-    function SQUARE_TOOL(){}
-    SQUARE_TOOL.prototype.squareTool = function(){
-        CANVAS_DOM.ctx.beginPath()
-        CANVAS_DOM.ctx.strokeRect(TOOLS.Cords.x1,TOOLS.Cords.y1,TOOLS.Cords.x2 - TOOLS.Cords.x1,TOOLS.Cords.y2 - TOOLS.Cords.y1)
-        CANVAS_DOM.ctx.stroke()
+    WIDE_TOOL.prototype.wideTool = function(e){
+        TOOLS.Styles.lineWidth = e.target.value
+        UI.WideTool.showWide.textContent = e.target.value
+        CANVAS_DOM.ctx.lineWidth = TOOLS.Styles.lineWidth
+        CANVAS_DOM.ctxPlaceholder.lineWidth = TOOLS.Styles.lineWidth
+    }
+    function SQUARE_TOOL(){
+    }
+  
+    SQUARE_TOOL.prototype.squareToolStroke = function(){
+        if(TOOLS.Controllers.isPaint){
+            if(!TOOLS.Controllers.isPath){
+                CANVAS_DOM.ctxPlaceholder.beginPath()
+            }
+            CANVAS_DOM.ctxPlaceholder.clearRect(TOOLS.Cords.x1,TOOLS.Cords.y1,CANVAS_DOM.canvasPlaceholder.width,CANVAS_DOM.canvasPlaceholder.height)
+            CANVAS_DOM.ctxPlaceholder.strokeStyle = TOOLS.Styles.strokeColor
+            CANVAS_DOM.ctxPlaceholder.strokeRect(TOOLS.Cords.x1,TOOLS.Cords.y1,TOOLS.Cords.x2 - TOOLS.Cords.x1,TOOLS.Cords.y2 - TOOLS.Cords.y1)
+            if(!TOOLS.Controllers.isPath){
+                CANVAS_DOM.ctxPlaceholder.closePath()
+            }
+        }else{
+            if(!TOOLS.Controllers.isPath){
+                CANVAS_DOM.ctx.beginPath()
+            }
+            CANVAS_DOM.ctx.strokeStyle = TOOLS.Styles.strokeColor
+            CANVAS_DOM.ctx.strokeRect(TOOLS.Cords.x1,TOOLS.Cords.y1,TOOLS.Cords.x2 - TOOLS.Cords.x1,TOOLS.Cords.y2 - TOOLS.Cords.y1)
+            if(!TOOLS.Controllers.isPath){
+                CANVAS_DOM.ctx.closePath()
+            }
+
+        }
+    }
+    SQUARE_TOOL.prototype.squareToolFill = function(){
+        if(TOOLS.Controllers.isPaint){
+            if(!TOOLS.Controllers.isPath){
+                CANVAS_DOM.ctxPlaceholder.beginPath()
+            }
+            CANVAS_DOM.ctxPlaceholder.clearRect(TOOLS.Cords.x1,TOOLS.Cords.y1,CANVAS_DOM.canvasPlaceholder.width,CANVAS_DOM.canvasPlaceholder.height)
+            CANVAS_DOM.ctxPlaceholder.fillRect(TOOLS.Cords.x1,TOOLS.Cords.y1,TOOLS.Cords.x2 - TOOLS.Cords.x1,TOOLS.Cords.y2 - TOOLS.Cords.y1)
+            if(!TOOLS.Controllers.isPath){
+                CANVAS_DOM.ctxPlaceholder.closePath()
+            }
+
+        }else{
+            if(!TOOLS.Controllers.isPath){
+                CANVAS_DOM.ctx.beginPath()
+            }
+            CANVAS_DOM.ctx.fillRect(TOOLS.Cords.x1,TOOLS.Cords.y1,TOOLS.Cords.x2 - TOOLS.Cords.x1,TOOLS.Cords.y2 - TOOLS.Cords.y1)
+            if(!TOOLS.Controllers.isPath){
+                CANVAS_DOM.ctx.closePath()
+            }
+
+        }
+    }
+    SQUARE_TOOL.prototype.squareToolFillStroke = function(){
+        if(TOOLS.Controllers.isPaint){
+            if(!TOOLS.Controllers.isPath){
+                CANVAS_DOM.ctxPlaceholder.beginPath()
+            }
+            CANVAS_DOM.ctxPlaceholder.strokeStyle = TOOLS.Styles.strokeColor
+            CANVAS_DOM.ctxPlaceholder.rect(TOOLS.Cords.x1,TOOLS.Cords.y1,TOOLS.Cords.x2 - TOOLS.Cords.x1,TOOLS.Cords.y2 - TOOLS.Cords.y1)
+            CANVAS_DOM.ctxPlaceholder.stroke()
+            CANVAS_DOM.ctxPlaceholder.fill()
+            if(!TOOLS.Controllers.isPath){
+                CANVAS_DOM.ctxPlaceholder.closePath()
+            }
+
+        }else{
+            if(!TOOLS.Controllers.isPath){
+                CANVAS_DOM.ctx.beginPath()
+            }
+            CANVAS_DOM.ctx.strokeStyle = TOOLS.Styles.sttrokeColor
+            CANVAS_DOM.ctx.rect(TOOLS.Cords.x1,TOOLS.Cords.y1,TOOLS.Cords.x2 - TOOLS.Cords.x1,TOOLS.Cords.y2 - TOOLS.Cords.y1)
+            CANVAS_DOM.ctx.stroke()
+            CANVAS_DOM.ctx.fill()
+            if(!TOOLS.Controllers.isPath){
+                CANVAS_DOM.ctx.closePath()
+            }
+
+        }
     }
     function CIRCLE_TOOL(){}
-    CIRCLE_TOOL.prototype.circleTool = function(){
-        CANVAS_DOM.ctx.beginPath()
-        CANVAS_DOM.ctx.arc(TOOLS.Cords.x1,TOOLS.Cords.y1,TOOLS.Cords.x2 - TOOLS.Cords.x1,0,2*Math.PI,false)
-        CANVAS_DOM.ctx.flllStyle = 'white'
-        CANVAS_DOM.ctx.stroke()
-    
+    CIRCLE_TOOL.prototype.circleToolStroke = function(){
+        if(TOOLS.Controllers.isPaint){
+            if(!TOOLS.Controllers.isPath){
+                CANVAS_DOM.ctxPlaceholder.beginPath()  
+            } 
+                CANVAS_DOM.ctxPlaceholder.clearRect(TOOLS.Cords.x1,TOOLS.Cords.y1,CANVAS_DOM.canvasPlaceholder.width,CANVAS_DOM.canvasPlaceholder.height)
+                CANVAS_DOM.ctxPlaceholder.arc(TOOLS.Cords.x1,TOOLS.Cords.y1,TOOLS.Cords.x2 - TOOLS.Cords.x1,0,2*Math.PI,false)
+                CANVAS_DOM.ctxPlaceholder.stroke()
+            if(!TOOLS.Controllers.isPath){
+                CANVAS_DOM.ctxPlaceholder.closePath()
+            } 
+        }else{
+            if(!TOOLS.Controllers.isPath){
+                CANVAS_DOM.ctxPlaceholder.beginPath()   
+            }
+            CANVAS_DOM.ctx.arc(TOOLS.Cords.x1,TOOLS.Cords.y1,Math.abs(TOOLS.Cords.r),0,2*Math.PI,false)
+            CANVAS_DOM.ctx.stroke()
+            if(!TOOLS.Controllers.isPath){
+                CANVAS_DOM.ctxPlaceholder.closePath()
+            }
+        }
+        if(!TOOLS.Controllers.isPath){
+            CANVAS_DOM.ctx.beginPath()
+        }    
+    }
+    CIRCLE_TOOL.prototype.circleToolFill = function(){
+        if(TOOLS.Controllers.isPaint){
+            if(!TOOLS.Controllers.isPath){
+                CANVAS_DOM.ctxPlaceholder.beginPath()  
+            } 
+                CANVAS_DOM.ctxPlaceholder.clearRect(TOOLS.Cords.x1,TOOLS.Cords.y1,CANVAS_DOM.canvasPlaceholder.width,CANVAS_DOM.canvasPlaceholder.height)
+                CANVAS_DOM.ctxPlaceholder.arc(TOOLS.Cords.x1,TOOLS.Cords.y1,TOOLS.Cords.x2 - TOOLS.Cords.x1,0,2*Math.PI,false)
+                CANVAS_DOM.ctxPlaceholder.fill()
+            if(!TOOLS.Controllers.isPath){
+                CANVAS_DOM.ctxPlaceholder.closePath()
+            } 
+        }else{
+            if(!TOOLS.Controllers.isPath){
+                CANVAS_DOM.ctxPlaceholder.beginPath()   
+            }
+            CANVAS_DOM.ctx.arc(TOOLS.Cords.x1,TOOLS.Cords.y1,Math.abs(TOOLS.Cords.r),0,2*Math.PI,false)
+            CANVAS_DOM.ctx.fill()
+            if(!TOOLS.Controllers.isPath){
+                CANVAS_DOM.ctxPlaceholder.closePath()
+            }
+        }
+        if(!TOOLS.Controllers.isPath){
+            CANVAS_DOM.ctx.beginPath()
+        }    
+    }
+    CIRCLE_TOOL.prototype.circleToolFillStroke = function(){
+        if(TOOLS.Controllers.isPaint){
+            if(!TOOLS.Controllers.isPath){
+                CANVAS_DOM.ctxPlaceholder.beginPath()  
+            } 
+                CANVAS_DOM.ctxPlaceholder.clearRect(TOOLS.Cords.x1,TOOLS.Cords.y1,CANVAS_DOM.canvasPlaceholder.width,CANVAS_DOM.canvasPlaceholder.height)
+                CANVAS_DOM.ctxPlaceholder.arc(TOOLS.Cords.x1,TOOLS.Cords.y1,TOOLS.Cords.x2 - TOOLS.Cords.x1,0,2*Math.PI,false)
+                CANVAS_DOM.ctxPlaceholder.stroke()
+                CANVAS_DOM.ctxPlaceholder.fill()
+            if(!TOOLS.Controllers.isPath){
+                CANVAS_DOM.ctxPlaceholder.closePath()
+            } 
+        }else{
+            if(!TOOLS.Controllers.isPath){
+                CANVAS_DOM.ctxPlaceholder.beginPath()   
+            }
+            CANVAS_DOM.ctx.arc(TOOLS.Cords.x1,TOOLS.Cords.y1,Math.abs(TOOLS.Cords.r),0,2*Math.PI,false)
+            CANVAS_DOM.ctx.stroke()
+            CANVAS_DOM.ctx.fill()
+            if(!TOOLS.Controllers.isPath){
+                CANVAS_DOM.ctxPlaceholder.closePath()
+            }
+        }
+        if(!TOOLS.Controllers.isPath){
+            CANVAS_DOM.ctx.beginPath()
+        }    
     }
     function PENCIL_TOOL(){
         this.square = 'square'
@@ -298,6 +465,7 @@ function TOOLS_ACTIONS(){
     
     
     function LINE_TOOL(){}
+    
     LINE_TOOL.prototype.lineTool = function(){
         CANVAS_DOM.ctx.lineCap = 'round'
         // DOM.ctx.lineDashOffset = 24
@@ -306,7 +474,9 @@ function TOOLS_ACTIONS(){
         CANVAS_DOM.ctx.strokeStyle = TOOLS.Styles.strokeColor
         CANVAS_DOM.ctx.stroke()
     }
-
+    LINE_TOOL.prototype.setLineJoin = function(e){
+        TOOLS.Styles.lineJoin =  e.target.dataset.join
+    }
     function TEXT_TOOL(){}
     function PATH_TOOL(){}
     function BEZIER_TOOL(){}
@@ -340,22 +510,29 @@ function TOOLS_ACTIONS(){
     function COLOR_TOOL(){}
     COLOR_TOOL.prototype.setFirstColor = function(e){
         TOOLS.Styles.firstColor = e.target.value
+        CANVAS_DOM.ctx.fillStyle = TOOLS.Styles.firstColor
+        CANVAS_DOM.ctxPlaceholder.fillStyle = TOOLS.Styles.firstColor
     }
     COLOR_TOOL.prototype.setSecondColor = function(e){
         TOOLS.Styles.secondColor = e.target.value
     }
     COLOR_TOOL.prototype.setSwapColors = function(){
         if(!TOOLS.Controllers.swapColors){
-            this.fillColor = this.secondColor
             UI.UI_DOM.firstColorInput.value =  TOOLS.Styles.secondColor
             UI.UI_DOM.secondColorInput.value =  TOOLS.Styles.firstColor
+            CANVAS_DOM.ctx.fillStyle = TOOLS.Styles.secondColor
+            CANVAS_DOM.ctxPlaceholder.fillStyle = TOOLS.Styles.secondColor
             TOOLS.Controllers.swapColors = true
         }else{
-            this.fillColor = this.firstColor
             UI.UI_DOM.firstColorInput.value =  TOOLS.Styles.firstColor
             UI.UI_DOM.secondColorInput.value =  TOOLS.Styles.secondColor
+            CANVAS_DOM.ctx.fillStyle = TOOLS.Styles.firstColor
+            CANVAS_DOM.ctxPlaceholder.fillStyle = TOOLS.Styles.firstColor
             TOOLS.Controllers.swapColors = false
         }
+    }
+    function SAVE__TOOL(){
+
     }
 
     this.Controllers = new CONTROLLERS()
@@ -376,9 +553,8 @@ function TOOLS_ACTIONS(){
     this.ShadowTool = new SHADOW_TOOL()
     this.RubberTool = new RUBBER_TOOL()
     this.StrokeTool = new STROKE_TOOL()
-    
-
     this.ColorTool = new COLOR_TOOL()
+    this.SaveTool = new SAVE__TOOL()
 }
 
 const TOOLS = new TOOLS_ACTIONS()
@@ -388,32 +564,26 @@ window.addEventListener('DOMContentLoaded',()=>{
 })
 
 CANVAS_DOM.canvas.addEventListener('mousedown',(e)=>{
-    TOOLS.Controllers.isActive()
+   CANVAS_DOM.ctxPlaceholder.clearRect(0,0,CANVAS_DOM.canvasPlaceholder.width,CANVAS_DOM.canvasPlaceholder.height)
+   TOOLS.Controllers.isActive()
+   TOOLS.Cords.setStartPos(e)
    if(TOOLS.activeTool !== 'pathTool'){
-    TOOLS.Cords.setStartPos(e)
        CANVAS_DOM.ctx.moveTo(TOOLS.Cords.x1,TOOLS.Cords.y1)
    }
-   if(TOOLS.activeTool === 'squareTool' || TOOLS.activeTool === 'circleTool'){
-    TOOLS.Cords.setStartPos(e)
-   }
+
 })
 
 CANVAS_DOM.canvas.addEventListener('mouseup',(e)=>{
     TOOLS.Controllers.isActive()
     CANVAS_DOM.ctx.closePath()
-    if(TOOLS.Controllers.activeTool === 'lineTool'){
-        TOOLS.LineTool.lineTool()
-    }else if(TOOLS.Controllers.activeTool ==='squareTool' || TOOLS.Controllers.activeTool === 'circleTool'){
-        TOOLS[TOOLS.Controllers.activeTool][TOOLS.Controllers.toolAction]()
-    }
+    TOOLS[TOOLS.Controllers.activeTool][TOOLS.Controllers.toolAction]()
  })
 
 CANVAS_DOM.canvas.addEventListener('mousemove',(e)=>{
-    if(TOOLS.Controllers.activeTool !== 'squareTool' && TOOLS.Controllers.activeTool !== 'circleTool'){
-        TOOLS.Cords.setStartPos(e)
-    }else if(TOOLS.Controllers.activeTool === 'squareTool' || TOOLS.Controllers.activeTool === 'circleTool' || TOOLS.Controllers.activeTool === 'lineTool'){
-        TOOLS.Cords.setEndPos(e)
-    }
+CANVAS_DOM.ctxPlaceholder.clearRect(0,0,CANVAS_DOM.canvasPlaceholder.width,CANVAS_DOM.canvasPlaceholder.height)
+
+    TOOLS.Cords.setEndPos(e)
+    TOOLS.Cords.setRadius(e)
     if(TOOLS.Controllers.isPaint){
         if(TOOLS.Controllers.activeTool !== 'lineTool' && TOOLS.Controllers.activeTool !== 'squareTool' && TOOLS.Controllers.activeTool !== 'circleTool'){
             TOOLS[TOOLS.Controllers.activeTool][TOOLS.Controllers.toolAction]()
@@ -421,22 +591,45 @@ CANVAS_DOM.canvas.addEventListener('mousemove',(e)=>{
     }
 })
 
-UI.UI_DOM.allMenusDivs.forEach(item => {
+UI.UI_DOM.allMenuItems.forEach(item => {
     item.addEventListener('mouseenter',(e)=>UI.displayTooltip(e))
 })
-
+UI.UI_DOM.allTools.forEach((item,index) => {
+    item.addEventListener('mousedown',(e)=>UI.clickToolPush(e))
+    item.addEventListener('mouseup',(e)=>UI.clickToolRelease(e))
+})
 UI.UI_DOM.allTools.forEach((item,index) => {
     if(index > 9){
         item.addEventListener('mouseenter',(e)=>UI.displayTooltip(e))
     }
 })
+UI.UI_DOM.allTools.forEach((item,index) => {
+    if(index === 18){
+        item.addEventListener('mouseenter',(e)=>UI.displayTooltip(e))
+    }
+})
 
+UI.UI_DOM.allMenuItems.forEach(tool => tool.addEventListener('click',(e)=>{
+    UI.setActiveIcon(e)
+    if(tool.dataset.action){
+        TOOLS.Controllers.setActiveTool(e)
+    }
+}))
 
-
-
-
-UI.UI_DOM.allTools.forEach(tool => tool.addEventListener('click',(e)=>TOOLS.Controllers.setActiveTool(e)))
-UI.UI_DOM.allTools.forEach(tool => tool.addEventListener('click',(e)=>UI.setActiveIcon(e)))
+UI.CanvasTool.canvasHeight.addEventListener('mousedown',(e)=>UI.setActiveIcon(e))
+UI.CanvasTool.canvasHeight.addEventListener('mousedown',(e)=>TOOLS.Controllers.setActiveTool(e))
+UI.CanvasTool.canvasWidth.addEventListener('mousedown',(e)=>TOOLS.Controllers.setActiveTool(e))
+UI.CanvasTool.canvasWidth.addEventListener('mousedown',(e)=>TOOLS.Controllers.setActiveTool(e))
+UI.UI_DOM.allTools.forEach(tool => tool.addEventListener('click',(e)=>{
+    if(tool.dataset.action){
+        TOOLS.Controllers.setActiveTool(e)
+    }
+}))
+UI.UI_DOM.allTools.forEach(tool => {
+    if(tool.dataset.action){
+        tool.addEventListener('click',(e)=>UI.setActiveIcon(e))
+    }
+})
 UI.UI_DOM.allTools.forEach(parentItem => {
     parentItem.addEventListener('click',(e)=>{
         const items = parentItem.querySelectorAll('div')
@@ -445,8 +638,18 @@ UI.UI_DOM.allTools.forEach(parentItem => {
     })
 })
 
-UI.StrokeTool.strokeColorInput.addEventListener('input',(e)=>TOOLS.setStrokeColor(e))
-UI.ColorTool.firstColorInput.addEventListener('input',(e)=>TOOLS.setFirstColor(e))
-UI.ColorTool.secondColorInput.addEventListener('input',(e)=>TOOLS.setSecondColor(e))
+UI.CanvasTool.canvasHeight.addEventListener('input',(e)=>{TOOLS.CanvasTool.canvasHeight(e)})
+UI.CanvasTool.canvasWidth.addEventListener('input',(e)=>{TOOLS.CanvasTool.canvasWidth(e)})
+UI.CanvasTool.canvasColor.addEventListener('input',(e)=>TOOLS.CanvasTool.canvasColor(e))
+UI.CanvasTool.clearCanvas.addEventListener('click',TOOLS.CanvasTool.canvasClear)
+
+UI.WideTool.wideTool.addEventListener('input',(e)=>TOOLS.WideTool.wideTool(e))
+UI.SquareTool.lineJoinItems.forEach(item => item.addEventListener('click',(e)=>TOOLS.SquareTool.setLineJoin(e)))
+
+
+
+UI.StrokeTool.strokeColorInput.addEventListener('input',(e)=>TOOLS.StrokeTool.setStrokeColor(e))
+UI.ColorTool.firstColorInput.addEventListener('input',(e)=>TOOLS.ColorTool.setFirstColor(e))
+UI.ColorTool.secondColorInput.addEventListener('input',(e)=>TOOLS.ColorTool.setSecondColor(e))
 UI.ColorTool.swapBtn.addEventListener('click',()=>TOOLS.setSwapColors())
 // Canvas2Image.saveAsPNG(CANVAS_DOM.canvas)
