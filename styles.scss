@@ -88,11 +88,24 @@
     }
 }
 .tools{
-    &__tooltip,
-    &__tooltip-left{
+
+    &__input-prompt{
+        position:absolute;
+        opacity:0;
+        top:0px;
+        left:0px;
+        outline:none;
+        border: 0px;
+        border-bottom:1px solid black;
+        &:focus{
+            opacity:1;
+        }
+    }
+    &__tooltip{
         opacity:0;
         min-width: 100%;
         position: absolute;
+        max-height: fit-content;
         top:65px;
         left:7px;
         z-index: 2;
@@ -129,6 +142,10 @@
         min-width: 40px;
         width:40px;
         max-width:40px;
+        min-height: 30px;
+        display:flex;
+        justify-content: center;
+        align-items: center;
         .tools__tooltip-triangle{
             left:15px;
         }
@@ -457,6 +474,10 @@
             }
         }
     }
+    &__rubber{
+        min-width: 95%;
+       
+    }
     &__stroke-color{
         min-width: 95%;
         height:10px !important;
@@ -571,6 +592,7 @@
 #ctx-placeholder{
     border:1px solid lightgrey;
     pointer-events: none;
+    z-index: 2;
     position:absolute;
     left:90px;
     top:0px;

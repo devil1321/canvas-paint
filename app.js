@@ -55,10 +55,19 @@ function UI_ACTIONS(){
         this.lineJoinItems = document.querySelectorAll('.tools__line-join')
 
     }
-    function TEXT_TOOL(){}
-    function PATH_TOOL(){}
+    function TEXT_TOOL(){
+        this.promptWrapper = document.querySelector('.tools__prompt-wrapper')
+        this.prompt = document.querySelector('.--prompt')
+        this.fill = document.querySelector('.--stroke-text')
+        this.stroke = document.querySelector('.--fill-text')
+    }
+   
     function BEZIER_TOOL(){}
-    function GRADIENT_TOOL(){}
+    function GRADIENT_TOOL(){
+        this.linear = document.querySelector('.--linear-gradient')
+        this.radial = document.querySelector('.--radial-gradient')
+        this.off = document.querySelector('.--gradient-off')
+    }
     function ALPHA_TOOL(){}
     function SHADOW_TOOL(){
         this.shadow = document.querySelector('.tools__shadow')
@@ -89,7 +98,6 @@ function UI_ACTIONS(){
     this.BrushTool = new BRUSH_TOOL()
     this.LineTool = new LINE_TOOL()
     this.TextTool = new TEXT_TOOL()
-    this.PathTool = new PATH_TOOL()
     this.BezierTool = new BEZIER_TOOL()
     this.GradientTool = new GRADIENT_TOOL()
     this.AlphaTool = new ALPHA_TOOL()
@@ -212,6 +220,8 @@ function TOOLS_ACTIONS(){
         this.toolAction = 'brushTool'
         this.swapColors = false
         this.isPath = false
+        this.isGradientLinear = false
+        this.isGradientRadial = false
 
     }
     CONTROLLERS.prototype.setActiveTool = function(e){
@@ -227,6 +237,7 @@ function TOOLS_ACTIONS(){
             this.isPaint = false
         }
     }
+  
     function CORDS(){
         this.x1 = 100
         this.y1 = 0
@@ -244,10 +255,14 @@ function TOOLS_ACTIONS(){
         this.y2 = e.clientY
     }
     CORDS.prototype.setRadius = function(e){
-        this.r = this.x2 - this.x1
+        if(this.x2 - this.x1 > 0){
+            this.r = this.x2 - this.x1
+        }else{
+            this.r = (this.x2 - this.x1) * (-1)
+        }
     }
     function STYLES(){
-        this.lineWidth = 10
+        this.lineWidth = 3
         this.lineJoin = 'square'
         this.pencilLineCap = 'square'
         this.brushLineCap = 'square'
@@ -256,6 +271,7 @@ function TOOLS_ACTIONS(){
         this.strokeColor = '#000000'
         this.firstColor = '#000000'
         this.secondColor = '#ffffff'
+        this.gradient = ''
     }
     function CANVAS_TOOL(){
     }
@@ -289,12 +305,14 @@ function TOOLS_ACTIONS(){
     }
   
     SQUARE_TOOL.prototype.squareToolStroke = function(){
-        if(TOOLS.Controllers.isPaint){
+       if(TOOLS.Controllers.isPaint){
             if(!TOOLS.Controllers.isPath){
                 CANVAS_DOM.ctxPlaceholder.beginPath()
             }
-            CANVAS_DOM.ctxPlaceholder.clearRect(TOOLS.Cords.x1,TOOLS.Cords.y1,CANVAS_DOM.canvasPlaceholder.width,CANVAS_DOM.canvasPlaceholder.height)
+            CANVAS_DOM.ctxPlaceholder.shadowBlur = 0
+            CANVAS_DOM.ctxPlaceholder.clearRect(0,0,CANVAS_DOM.canvasPlaceholder.width,CANVAS_DOM.canvasPlaceholder.height)
             CANVAS_DOM.ctxPlaceholder.strokeStyle = TOOLS.Styles.strokeColor
+            CANVAS_DOM.ctxPlaceholder.lineWidth= TOOLS.Styles.lineWidth
             CANVAS_DOM.ctxPlaceholder.strokeRect(TOOLS.Cords.x1,TOOLS.Cords.y1,TOOLS.Cords.x2 - TOOLS.Cords.x1,TOOLS.Cords.y2 - TOOLS.Cords.y1)
             if(!TOOLS.Controllers.isPath){
                 CANVAS_DOM.ctxPlaceholder.closePath()
@@ -303,7 +321,11 @@ function TOOLS_ACTIONS(){
             if(!TOOLS.Controllers.isPath){
                 CANVAS_DOM.ctx.beginPath()
             }
+
+            CANVAS_DOM.ctx.shadowBlur = 0
             CANVAS_DOM.ctx.strokeStyle = TOOLS.Styles.strokeColor
+            CANVAS_DOM.ctx.lineWidth= TOOLS.Styles.lineWidth
+
             CANVAS_DOM.ctx.strokeRect(TOOLS.Cords.x1,TOOLS.Cords.y1,TOOLS.Cords.x2 - TOOLS.Cords.x1,TOOLS.Cords.y2 - TOOLS.Cords.y1)
             if(!TOOLS.Controllers.isPath){
                 CANVAS_DOM.ctx.closePath()
@@ -316,7 +338,12 @@ function TOOLS_ACTIONS(){
             if(!TOOLS.Controllers.isPath){
                 CANVAS_DOM.ctxPlaceholder.beginPath()
             }
-            CANVAS_DOM.ctxPlaceholder.clearRect(TOOLS.Cords.x1,TOOLS.Cords.y1,CANVAS_DOM.canvasPlaceholder.width,CANVAS_DOM.canvasPlaceholder.height)
+            CANVAS_DOM.ctxPlaceholder.shadowBlur = 0
+            CANVAS_DOM.ctxPlaceholder.lineWidth= TOOLS.Styles.lineWidth
+            CANVAS_DOM.ctxPlaceholder.clearRect(0,0,CANVAS_DOM.canvasPlaceholder.width,CANVAS_DOM.canvasPlaceholder.height)
+            if(TOOLS.Controllers.isGradientLinear || TOOLS.Controllers.isGradientRadial){
+                CANVAS_DOM.ctxPlaceholder.fillStyle = TOOLS.Styles.gradient
+            }
             CANVAS_DOM.ctxPlaceholder.fillRect(TOOLS.Cords.x1,TOOLS.Cords.y1,TOOLS.Cords.x2 - TOOLS.Cords.x1,TOOLS.Cords.y2 - TOOLS.Cords.y1)
             if(!TOOLS.Controllers.isPath){
                 CANVAS_DOM.ctxPlaceholder.closePath()
@@ -325,6 +352,11 @@ function TOOLS_ACTIONS(){
         }else{
             if(!TOOLS.Controllers.isPath){
                 CANVAS_DOM.ctx.beginPath()
+            }
+            CANVAS_DOM.ctx.shadowBlur = 0
+            CANVAS_DOM.ctx.lineWidth= TOOLS.Styles.lineWidth
+            if(TOOLS.Controllers.isGradientLinear || TOOLS.Controllers.isGradientRadial){
+                CANVAS_DOM.ctx.fillStyle = TOOLS.Styles.gradient
             }
             CANVAS_DOM.ctx.fillRect(TOOLS.Cords.x1,TOOLS.Cords.y1,TOOLS.Cords.x2 - TOOLS.Cords.x1,TOOLS.Cords.y2 - TOOLS.Cords.y1)
             if(!TOOLS.Controllers.isPath){
@@ -338,8 +370,17 @@ function TOOLS_ACTIONS(){
             if(!TOOLS.Controllers.isPath){
                 CANVAS_DOM.ctxPlaceholder.beginPath()
             }
+            CANVAS_DOM.ctxPlaceholder.lineWidth= TOOLS.Styles.lineWidth
+            if(TOOLS.Controllers.isGradientLinear || TOOLS.Controllers.isGradientRadial){
+                CANVAS_DOM.ctxPlaceholder.fillStyle = TOOLS.Styles.gradient
+            }
+            CANVAS_DOM.ctxPlaceholder.shadowBlur = 0
             CANVAS_DOM.ctxPlaceholder.strokeStyle = TOOLS.Styles.strokeColor
+            CANVAS_DOM.ctxPlaceholder.clearRect(0,0,CANVAS_DOM.canvasPlaceholder.width,CANVAS_DOM.canvasPlaceholder.height)
             CANVAS_DOM.ctxPlaceholder.rect(TOOLS.Cords.x1,TOOLS.Cords.y1,TOOLS.Cords.x2 - TOOLS.Cords.x1,TOOLS.Cords.y2 - TOOLS.Cords.y1)
+            if(TOOLS.Controllers.isGradient){
+                CANVAS_DOM.ctxPlaceholder.fillStyle = TOOLS.Styles.gradient
+            }
             CANVAS_DOM.ctxPlaceholder.stroke()
             CANVAS_DOM.ctxPlaceholder.fill()
             if(!TOOLS.Controllers.isPath){
@@ -350,7 +391,12 @@ function TOOLS_ACTIONS(){
             if(!TOOLS.Controllers.isPath){
                 CANVAS_DOM.ctx.beginPath()
             }
-            CANVAS_DOM.ctx.strokeStyle = TOOLS.Styles.sttrokeColor
+            CANVAS_DOM.ctx.shadowBlur = 0
+            CANVAS_DOM.ctx.strokeStyle = TOOLS.Styles.strokeColor
+            CANVAS_DOM.ctx.lineWidth= TOOLS.Styles.lineWidth
+            if(TOOLS.Controllers.isGradientLinear || TOOLS.Controllers.isGradientRadial){
+                CANVAS_DOM.ctx.fillStyle = TOOLS.Styles.gradient
+            }
             CANVAS_DOM.ctx.rect(TOOLS.Cords.x1,TOOLS.Cords.y1,TOOLS.Cords.x2 - TOOLS.Cords.x1,TOOLS.Cords.y2 - TOOLS.Cords.y1)
             CANVAS_DOM.ctx.stroke()
             CANVAS_DOM.ctx.fill()
@@ -366,8 +412,11 @@ function TOOLS_ACTIONS(){
             if(!TOOLS.Controllers.isPath){
                 CANVAS_DOM.ctxPlaceholder.beginPath()  
             } 
-                CANVAS_DOM.ctxPlaceholder.clearRect(TOOLS.Cords.x1,TOOLS.Cords.y1,CANVAS_DOM.canvasPlaceholder.width,CANVAS_DOM.canvasPlaceholder.height)
-                CANVAS_DOM.ctxPlaceholder.arc(TOOLS.Cords.x1,TOOLS.Cords.y1,TOOLS.Cords.x2 - TOOLS.Cords.x1,0,2*Math.PI,false)
+                CANVAS_DOM.ctxPlaceholder.shadowBlur = 0
+                CANVAS_DOM.ctxPlaceholder.lineWidth= TOOLS.Styles.lineWidth
+
+                CANVAS_DOM.ctxPlaceholder.clearRect(0,0,CANVAS_DOM.canvasPlaceholder.width,CANVAS_DOM.canvasPlaceholder.height)
+                CANVAS_DOM.ctxPlaceholder.arc(TOOLS.Cords.x1,TOOLS.Cords.y1,TOOLS.Cords.r,0,2*Math.PI,false)
                 CANVAS_DOM.ctxPlaceholder.stroke()
             if(!TOOLS.Controllers.isPath){
                 CANVAS_DOM.ctxPlaceholder.closePath()
@@ -376,7 +425,10 @@ function TOOLS_ACTIONS(){
             if(!TOOLS.Controllers.isPath){
                 CANVAS_DOM.ctxPlaceholder.beginPath()   
             }
-            CANVAS_DOM.ctx.arc(TOOLS.Cords.x1,TOOLS.Cords.y1,Math.abs(TOOLS.Cords.r),0,2*Math.PI,false)
+            CANVAS_DOM.ctx.shadowBlur = 0
+            CANVAS_DOM.ctx.lineWidth= TOOLS.Styles.lineWidth
+
+            CANVAS_DOM.ctx.arc(TOOLS.Cords.x1,TOOLS.Cords.y1,TOOLS.Cords.r,0,2*Math.PI,false)
             CANVAS_DOM.ctx.stroke()
             if(!TOOLS.Controllers.isPath){
                 CANVAS_DOM.ctxPlaceholder.closePath()
@@ -391,8 +443,13 @@ function TOOLS_ACTIONS(){
             if(!TOOLS.Controllers.isPath){
                 CANVAS_DOM.ctxPlaceholder.beginPath()  
             } 
-                CANVAS_DOM.ctxPlaceholder.clearRect(TOOLS.Cords.x1,TOOLS.Cords.y1,CANVAS_DOM.canvasPlaceholder.width,CANVAS_DOM.canvasPlaceholder.height)
-                CANVAS_DOM.ctxPlaceholder.arc(TOOLS.Cords.x1,TOOLS.Cords.y1,TOOLS.Cords.x2 - TOOLS.Cords.x1,0,2*Math.PI,false)
+                CANVAS_DOM.ctxPlaceholder.lineWidth= TOOLS.Styles.lineWidth
+                CANVAS_DOM.ctxPlaceholder.shadowBlur = 0
+                CANVAS_DOM.ctxPlaceholder.clearRect(0,0,CANVAS_DOM.canvasPlaceholder.width,CANVAS_DOM.canvasPlaceholder.height)
+                if(TOOLS.Controllers.isGradientLinear || TOOLS.Controllers.isGradientRadial){
+                    CANVAS_DOM.ctxPlaceholder.fillStyle = TOOLS.Styles.gradient
+                }
+                CANVAS_DOM.ctxPlaceholder.arc(TOOLS.Cords.x1,TOOLS.Cords.y1,TOOLS.Cords.r,0,2*Math.PI,false)
                 CANVAS_DOM.ctxPlaceholder.fill()
             if(!TOOLS.Controllers.isPath){
                 CANVAS_DOM.ctxPlaceholder.closePath()
@@ -401,7 +458,12 @@ function TOOLS_ACTIONS(){
             if(!TOOLS.Controllers.isPath){
                 CANVAS_DOM.ctxPlaceholder.beginPath()   
             }
-            CANVAS_DOM.ctx.arc(TOOLS.Cords.x1,TOOLS.Cords.y1,Math.abs(TOOLS.Cords.r),0,2*Math.PI,false)
+            CANVAS_DOM.ctx.shadowBlur = 0
+            CANVAS_DOM.ctx.lineWidth= TOOLS.Styles.lineWidth
+            if(TOOLS.Controllers.isGradientLinear || TOOLS.Controllers.isGradientRadial){
+                CANVAS_DOM.ctx.fillStyle = TOOLS.Styles.gradient
+            }
+            CANVAS_DOM.ctx.arc(TOOLS.Cords.x1,TOOLS.Cords.y1,TOOLS.Cords.r,0,2*Math.PI,false)
             CANVAS_DOM.ctx.fill()
             if(!TOOLS.Controllers.isPath){
                 CANVAS_DOM.ctxPlaceholder.closePath()
@@ -416,8 +478,12 @@ function TOOLS_ACTIONS(){
             if(!TOOLS.Controllers.isPath){
                 CANVAS_DOM.ctxPlaceholder.beginPath()  
             } 
-                CANVAS_DOM.ctxPlaceholder.clearRect(TOOLS.Cords.x1,TOOLS.Cords.y1,CANVAS_DOM.canvasPlaceholder.width,CANVAS_DOM.canvasPlaceholder.height)
-                CANVAS_DOM.ctxPlaceholder.arc(TOOLS.Cords.x1,TOOLS.Cords.y1,TOOLS.Cords.x2 - TOOLS.Cords.x1,0,2*Math.PI,false)
+                CANVAS_DOM.ctxPlaceholder.shadowBlur = 0
+                CANVAS_DOM.ctxPlaceholder.clearRect(0,0,CANVAS_DOM.canvasPlaceholder.width,CANVAS_DOM.canvasPlaceholder.height)
+                if(TOOLS.Controllers.isGradientLinear || TOOLS.Controllers.isGradientRadial){
+                    CANVAS_DOM.ctxPlaceholder.fillStyle = TOOLS.Styles.gradient
+                }
+                CANVAS_DOM.ctxPlaceholder.arc(TOOLS.Cords.x1,TOOLS.Cords.y1,TOOLS.Cords.r,0,2*Math.PI,false)
                 CANVAS_DOM.ctxPlaceholder.stroke()
                 CANVAS_DOM.ctxPlaceholder.fill()
             if(!TOOLS.Controllers.isPath){
@@ -427,7 +493,11 @@ function TOOLS_ACTIONS(){
             if(!TOOLS.Controllers.isPath){
                 CANVAS_DOM.ctxPlaceholder.beginPath()   
             }
-            CANVAS_DOM.ctx.arc(TOOLS.Cords.x1,TOOLS.Cords.y1,Math.abs(TOOLS.Cords.r),0,2*Math.PI,false)
+            CANVAS_DOM.ctx.shadowBlur = 0
+            if(TOOLS.Controllers.isGradientLinear || TOOLS.Controllers.isGradientRadial){
+                CANVAS_DOM.ctx.fillStyle = TOOLS.Styles.gradient
+            }
+            CANVAS_DOM.ctx.arc(TOOLS.Cords.x1,TOOLS.Cords.y1,TOOLS.Cords.r,0,2*Math.PI,false)
             CANVAS_DOM.ctx.stroke()
             CANVAS_DOM.ctx.fill()
             if(!TOOLS.Controllers.isPath){
@@ -439,8 +509,7 @@ function TOOLS_ACTIONS(){
         }    
     }
     function PENCIL_TOOL(){
-     
-        this.blur = '10'
+        this.blur = '5'
     }
     PENCIL_TOOL.prototype.setCap = function(e){
         TOOLS.Styles.pencilLineCap = e.target.dataset.cap
@@ -449,7 +518,9 @@ function TOOLS_ACTIONS(){
         if(!TOOLS.Controllers.isPath){
             CANVAS_DOM.ctx.beginPath()
         }
+        CANVAS_DOM.ctx.shadowBlur = 0
         CANVAS_DOM.ctx.lineCap = TOOLS.Styles.pencilLineCap
+        CANVAS_DOM.ctx.lineWidth = TOOLS.Styles.lineWidth / 2
         CANVAS_DOM.ctx.strokeStyle = TOOLS.Styles.strokeColor
         CANVAS_DOM.ctx.lineTo(TOOLS.Cords.x1,TOOLS.Cords.y1)
         CANVAS_DOM.ctx.stroke()
@@ -457,7 +528,21 @@ function TOOLS_ACTIONS(){
             CANVAS_DOM.ctx.closePath()
         }
     }
-    
+    PENCIL_TOOL.prototype.pencilToolLazy  = function(){
+        if(!TOOLS.Controllers.isPath){
+            CANVAS_DOM.ctx.beginPath()
+        }
+        CANVAS_DOM.ctx.lineCap = TOOLS.Styles.pencilLineCap
+        CANVAS_DOM.ctx.lineWidth = TOOLS.Styles.lineWidth /  2
+        CANVAS_DOM.ctx.shadowBlur = this.blur
+        CANVAS_DOM.ctx.shadowColor = TOOLS.Styles.strokeColor
+        CANVAS_DOM.ctx.strokeStyle = TOOLS.Styles.strokeColor
+        CANVAS_DOM.ctx.lineTo(TOOLS.Cords.x1,TOOLS.Cords.y1)
+        CANVAS_DOM.ctx.stroke()
+        if(!TOOLS.Controllers.isPath){
+            CANVAS_DOM.ctx.closePath()
+        }
+    }
     function BRUSH_TOOL(){
         this.blur = '10'
     }   
@@ -465,45 +550,190 @@ function TOOLS_ACTIONS(){
         TOOLS.Styles.brushLineCap = e.target.dataset.cap
     }
     BRUSH_TOOL.prototype.brushTool = function(){
-        CANVAS_DOM.ctx.beginPath()
-        CANVAS_DOM.ctx.lineCap = 'round'
-        CANVAS_DOM.ctx.lineTo(TOOLS.Cords.x1,TOOLS.Cords.y1)
-        CANVAS_DOM.ctx.lineWidth = TOOLS.Styles.wide
-        CANVAS_DOM.ctx.strokeStyle = TOOLS.Styles.strokeColor
-        CANVAS_DOM.ctx.stroke()
-    }
-    
-    
-    function LINE_TOOL(){}
-    
-    LINE_TOOL.prototype.lineTool = function(){
-        CANVAS_DOM.ctx.lineCap = 'square'
-        // DOM.ctx.lineDashOffset = 24
-        CANVAS_DOM.ctx.lineTo(TOOLS.Cords.x1,TOOLS.Cords.y2)
+        if(!TOOLS.Controllers.isPath){
+            CANVAS_DOM.ctx.beginPath()
+        }
+        CANVAS_DOM.ctx.shadowBlur = 10
+        CANVAS_DOM.ctx.lineCap = TOOLS.Styles.brushLineCap
         CANVAS_DOM.ctx.lineWidth = TOOLS.Styles.lineWidth
         CANVAS_DOM.ctx.strokeStyle = TOOLS.Styles.strokeColor
+        CANVAS_DOM.ctx.lineTo(TOOLS.Cords.x1,TOOLS.Cords.y1)
         CANVAS_DOM.ctx.stroke()
+        if(!TOOLS.Controllers.isPath){
+            CANVAS_DOM.ctx.closePath()
+        }
     }
+    BRUSH_TOOL.prototype.brushToolLazy  = function(){
+        if(!TOOLS.Controllers.isPath){
+            CANVAS_DOM.ctx.beginPath()
+        }
+        CANVAS_DOM.ctx.lineCap = TOOLS.Styles.brushLineCap
+        CANVAS_DOM.ctx.lineWidth = TOOLS.Styles.lineWidth
+        CANVAS_DOM.ctx.shadowBlur = this.blur
+        CANVAS_DOM.ctx.shadowColor = TOOLS.Styles.strokeColor
+        CANVAS_DOM.ctx.strokeStyle = TOOLS.Styles.strokeColor
+        CANVAS_DOM.ctx.lineTo(TOOLS.Cords.x1,TOOLS.Cords.y1)
+        CANVAS_DOM.ctx.stroke()
+        if(!TOOLS.Controllers.isPath){
+            CANVAS_DOM.ctx.closePath()
+        }
+    }
+    function LINE_TOOL(){}
     LINE_TOOL.prototype.setLineJoin = function(e){
         TOOLS.Styles.lineJoin =  e.target.dataset.join
     }
-    function TEXT_TOOL(){}
-    function PATH_TOOL(){}
+    LINE_TOOL.prototype.lineToolSquare = function(){
+        if(TOOLS.Controllers.isPaint){
+            if(!TOOLS.Controllers.isPath){
+                CANVAS_DOM.ctxPlaceholder.beginPath()
+                CANVAS_DOM.ctxPlaceholder.moveTo(TOOLS.Cords.x1,TOOLS.Cords.y1)
+
+            }
+            CANVAS_DOM.ctxPlaceholder.lineCap = 'square'
+            // DOM.ctx.lineDashOffset = 24
+            CANVAS_DOM.ctxPlaceholder.clearRect(0,0,CANVAS_DOM.canvasPlaceholder.width,CANVAS_DOM.canvasPlaceholder.height)
+      
+            CANVAS_DOM.ctxPlaceholder.lineTo(TOOLS.Cords.x2 ,TOOLS.Cords.y2)
+            CANVAS_DOM.ctxPlaceholder.lineWidth = TOOLS.Styles.lineWidth
+            CANVAS_DOM.ctxPlaceholder.strokeStyle = TOOLS.Styles.strokeColor
+            CANVAS_DOM.ctxPlaceholder.stroke()
+            if(!TOOLS.Controllers.isPath){
+                CANVAS_DOM.ctxPlaceholder.closePath()
+            }
+        }else{
+            if(!TOOLS.Controllers.isPath){
+                CANVAS_DOM.ctx.beginPath()
+                CANVAS_DOM.ctx.moveTo(TOOLS.Cords.x1,TOOLS.Cords.y1)
+
+            }
+            CANVAS_DOM.ctx.lineCap = 'square'
+            // DOM.ctx.lineDashOffset = 24
+        
+            CANVAS_DOM.ctx.lineTo(TOOLS.Cords.x2 ,TOOLS.Cords.y2)
+            CANVAS_DOM.ctx.lineWidth = TOOLS.Styles.lineWidth
+            CANVAS_DOM.ctx.strokeStyle = TOOLS.Styles.strokeColor
+            CANVAS_DOM.ctx.stroke()
+            if(!TOOLS.Controllers.isPath){
+                CANVAS_DOM.ctx.closePath()
+            }
+        }
+      
+    }
+    LINE_TOOL.prototype.lineToolRound = function(){
+        if(TOOLS.Controllers.isPaint){
+            if(!TOOLS.Controllers.isPath){
+                CANVAS_DOM.ctxPlaceholder.beginPath()
+                CANVAS_DOM.ctx.moveTo(TOOLS.Cords.x1,TOOLS.Cords.y1)
+
+            }
+            CANVAS_DOM.ctxPlaceholder.lineCap = 'round'
+            // DOM.ctx.lineDashOffset = 24
+            CANVAS_DOM.ctxPlaceholder.clearRect(0,0,CANVAS_DOM.canvasPlaceholder.width,CANVAS_DOM.canvasPlaceholder.height)
+          
+            CANVAS_DOM.ctxPlaceholder.lineTo(TOOLS.Cords.x2 ,TOOLS.Cords.y2)
+            CANVAS_DOM.ctxPlaceholder.lineWidth = TOOLS.Styles.lineWidth
+            CANVAS_DOM.ctxPlaceholder.strokeStyle = TOOLS.Styles.strokeColor
+            CANVAS_DOM.ctxPlaceholder.stroke()
+            if(!TOOLS.Controllers.isPath){
+                CANVAS_DOM.ctxPlaceholder.closePath()
+            }
+        }else{
+            if(!TOOLS.Controllers.isPath){
+                CANVAS_DOM.ctx.beginPath()
+                CANVAS_DOM.ctx.moveTo(TOOLS.Cords.x1,TOOLS.Cords.y1)
+            }
+            CANVAS_DOM.ctx.lineCap = 'round'
+            CANVAS_DOM.ctx.lineTo(TOOLS.Cords.x2 ,TOOLS.Cords.y2)
+            CANVAS_DOM.ctx.lineWidth = TOOLS.Styles.lineWidth
+            CANVAS_DOM.ctx.strokeStyle = TOOLS.Styles.strokeColor
+            CANVAS_DOM.ctx.stroke()
+            if(!TOOLS.Controllers.isPath){
+                CANVAS_DOM.ctx.closePath()
+            }
+        }
+      
+    }
+  
+    function TEXT_TOOL(){
+        this.text = ''
+        this.isFill = true
+    }
+    TEXT_TOOL.prototype.textToolStroke = function(e){
+        TOOLS.TextTool.isFill = true
+    }
+    TEXT_TOOL.prototype.textToolFill = function(e){
+        TOOLS.TextTool.isFill = false
+    }
+    TEXT_TOOL.prototype.setPrompt = function(e){
+        e.preventDefault();
+        UI.TextTool.prompt.style.left = `${TOOLS.Cords.x1 + 80}px`
+        UI.TextTool.prompt.style.top = `${TOOLS.Cords.y1 - 50}px`
+        UI.TextTool.prompt.focus()
+        console.log('moved',TOOLS.Cords.x1,TOOLS.Cords.y1 -150)
+
+    }
+    TEXT_TOOL.prototype.setText = function(e){
+        TOOLS.TextTool.text = e.target.value
+    }
+    TEXT_TOOL.prototype.textToolNormal = function(e){
+        CANVAS_DOM.ctx.font=`normal 30px Arial`;
+        CANVAS_DOM.ctx.moveTo(TOOLS.Cords.x1,TOOLS.Cords.y1);
+        if(!this.isFill){
+            CANVAS_DOM.ctx.strokeText(this.text,TOOLS.Cords.x1,TOOLS.Cords.y1);
+        }else{
+            CANVAS_DOM.ctx.fillText(this.text,TOOLS.Cords.x1,TOOLS.Cords.y1);
+        }
+    }
+    TEXT_TOOL.prototype.textToolBold = function(e){
+        CANVAS_DOM.ctx.font=`bold 30px Arial`;
+        CANVAS_DOM.ctx.moveTo(TOOLS.Cords.x1,TOOLS.Cords.y1);
+        if(!this.isFill){
+            CANVAS_DOM.ctx.strokeText(this.text,TOOLS.Cords.x1,TOOLS.Cords.y1);
+        }else{
+            CANVAS_DOM.ctx.fillText(this.text,TOOLS.Cords.x1,TOOLS.Cords.y1);
+        }
+    }
+    TEXT_TOOL.prototype.textToolItalic = function(e){
+        CANVAS_DOM.ctx.font=`italic 30px Arial`;
+        CANVAS_DOM.ctx.moveTo(TOOLS.Cords.x1,TOOLS.Cords.y1);
+        if(!this.isFill){
+            CANVAS_DOM.ctx.strokeText(this.text,TOOLS.Cords.x1,TOOLS.Cords.y1);
+        }else{
+            CANVAS_DOM.ctx.fillText(this.text,TOOLS.Cords.x1,TOOLS.Cords.y1);
+        }
+    }
+   
+ 
+   
     function BEZIER_TOOL(){}
     function GRADIENT_TOOL(){}
     GRADIENT_TOOL.prototype.linearGradientTool = function(){
-        const gradient = DOM.ctx.createLinearGradient(0,0,200,0)
-        grd.addColorStop(0, "red");
-        grd.addColorStop(1, "white");   
-        CANVAS_DOM.ctx.fillStyle = gradient
+        console.log('on')
+        TOOLS.Controllers.isGradientLinear = true
+        TOOLS.Controllers.isGradientRadial = false
+    }
+    GRADIENT_TOOL.prototype.linearGradientActive = function(){
+        const gradient = CANVAS_DOM.ctx.createLinearGradient(TOOLS.Cords.x1,TOOLS.Cords.y1,TOOLS.Cords.x2-TOOLS.Cords.x1,TOOLS.Cords.y2-TOOLS.Cords.y2)
+        gradient.addColorStop(0, TOOLS.Styles.firstColor);
+        gradient.addColorStop(1, TOOLS.Styles.secondColor);   
+        TOOLS.Styles.gradient = gradient
     }
     GRADIENT_TOOL.prototype.radialGradientTool = function(){
-        const gradient = DOM.ctx.createRadialGradient(5, 50, 5, 90, 60, 100)
-        grd.addColorStop(0, "red");
-        grd.addColorStop(1, "white");
-        CANVAS_DOM.ctx.fillStyle = gradient
-
+        TOOLS.Controllers.isGradientLinear = false
+        TOOLS.Controllers.isGradientRadial = true
     }
+    GRADIENT_TOOL.prototype.radialGradientActive = function(){
+        TOOLS.Controllers.isGradient = true
+        const gradient = CANVAS_DOM.ctx.createRadialGradient(TOOLS.Cords.x1,TOOLS.Cords.y1,TOOLS.Cords.r,TOOLS.Cords.x2-TOOLS.Cords.x1,TOOLS.Cords.y2-TOOLS.Cords.y2,0)
+        gradient.addColorStop(0, TOOLS.Styles.firstColor);
+        gradient.addColorStop(1, TOOLS.Styles.secondColor);   
+        TOOLS.Styles.gradient = gradient
+    }
+    GRADIENT_TOOL.prototype.gradientToolOff =  function(){
+        TOOLS.Controllers.isGradientLinear = false
+        TOOLS.Controllers.isGradientRadial = false
+    }
+
     function ALPHA_TOOL(){}
     function SHADOW_TOOL(){}
     TOOLS_ACTIONS.prototype.shadowTool = function(){
@@ -556,7 +786,6 @@ function TOOLS_ACTIONS(){
     this.BrushTool = new BRUSH_TOOL()
     this.LineTool = new LINE_TOOL()
     this.TextTool = new TEXT_TOOL()
-    this.PathTool = new PATH_TOOL()
     this.BezierTool = new BEZIER_TOOL()
     this.GradientTool = new GRADIENT_TOOL()
     this.AlphaTool = new ALPHA_TOOL()
@@ -576,32 +805,47 @@ window.addEventListener('DOMContentLoaded',()=>{
 CANVAS_DOM.canvas.addEventListener('mousedown',(e)=>{
    CANVAS_DOM.ctxPlaceholder.clearRect(0,0,CANVAS_DOM.canvasPlaceholder.width,CANVAS_DOM.canvasPlaceholder.height)
    TOOLS.Controllers.isActive()
-   if(TOOLS.activeTool === 'pencilTool' || TOOLS.activeTool === 'pencilToolLazy' || TOOLS.activeTool !== 'brushTool' || TOOLS.activeTool !== 'brushToolLazy'){
-       TOOLS.Cords.setStartPos(e)
-   }
-   if(TOOLS.activeTool !== 'pathTool'){
+   TOOLS.Cords.setStartPos(e)
+   if(TOOLS.Controllers.activeTool !== 'PathTool' && TOOLS.Controllers.activeTool !== 'TextTool'){
        CANVAS_DOM.ctx.moveTo(TOOLS.Cords.x1,TOOLS.Cords.y1)
-   }
+    } else if(TOOLS.Controllers.activeTool === 'TextTool'){
+        TOOLS.TextTool.setPrompt(e)
+    }
 
 })
 
 CANVAS_DOM.canvas.addEventListener('mouseup',(e)=>{
     TOOLS.Controllers.isActive()
     CANVAS_DOM.ctx.closePath()
-    TOOLS[TOOLS.Controllers.activeTool][TOOLS.Controllers.toolAction]()
+    UI.TextTool.prompt.value  = ''
+    TOOLS.TextTool.text  = ''
+    if(TOOLS.Controllers.activeTool !== "TextTool"){
+        TOOLS[TOOLS.Controllers.activeTool][TOOLS.Controllers.toolAction]()
+    
+    }
  })
 
 CANVAS_DOM.canvas.addEventListener('mousemove',(e)=>{
-CANVAS_DOM.ctxPlaceholder.clearRect(0,0,CANVAS_DOM.canvasPlaceholder.width,CANVAS_DOM.canvasPlaceholder.height)
-   TOOLS.Cords.setStartPos(e)
-    
+    CANVAS_DOM.ctxPlaceholder.clearRect(0,0,CANVAS_DOM.canvasPlaceholder.width,CANVAS_DOM.canvasPlaceholder.height)
     TOOLS.Cords.setEndPos(e)
+    if(TOOLS.Controllers.activeTool === 'PencilTool' || TOOLS.Controllers.activeTool === 'BrushTool'){
+        TOOLS.Cords.setStartPos(e)
+    }
     TOOLS.Cords.setRadius(e)
-    if(TOOLS.Controllers.isPaint){
-        if(TOOLS.Controllers.activeTool !== 'lineTool'){
-            TOOLS[TOOLS.Controllers.activeTool][TOOLS.Controllers.toolAction]()
+    if(TOOLS.Controllers.isPaint && TOOLS.Controllers.activeTool !== "TextTool"){
+        TOOLS[TOOLS.Controllers.activeTool][TOOLS.Controllers.toolAction]()
+        if(TOOLS.Controllers.isGradientLinear){
+            TOOLS.GradientTool.linearGradientActive()
+        }
+        else if(TOOLS.Controllers.isGradientRadial){
+            TOOLS.GradientTool.radialGradientActive()
         }
     }
+})
+
+UI.TextTool.prompt.addEventListener('input',(e)=>{
+    TOOLS.TextTool.setText(e)
+    TOOLS[TOOLS.Controllers.activeTool][TOOLS.Controllers.toolAction]()
 })
 
 UI.UI_DOM.allMenuItems.forEach(item => {
@@ -664,7 +908,12 @@ UI.BrushTool.brushes.forEach(pencil => pencil.addEventListener('click',(e)=>TOOL
 
 UI.LineTool.lineJoinItems.forEach(item => item.addEventListener('click',(e)=>TOOLS.SquareTool.setLineJoin(e)))
 
+UI.TextTool.fill.addEventListener('click',TOOLS.TextTool.textToolFill)
+UI.TextTool.stroke.addEventListener('click',TOOLS.TextTool.textToolStroke)
 
+UI.GradientTool.linear.addEventListener('click',TOOLS.GradientTool.linearGradientTool)
+UI.GradientTool.radial.addEventListener('click',TOOLS.GradientTool.radialGradientTool)
+UI.GradientTool.off.addEventListener('click',TOOLS.GradientTool.gradientToolOff)
 
 UI.StrokeTool.strokeColorInput.addEventListener('input',(e)=>TOOLS.StrokeTool.setStrokeColor(e))
 UI.ColorTool.firstColorInput.addEventListener('input',(e)=>TOOLS.ColorTool.setFirstColor(e))
