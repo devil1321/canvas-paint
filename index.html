@@ -284,18 +284,20 @@
                 <div data-id="menu-10"  class="tools__bezier">
                     <i class="fas fa-bezier-curve"></i>
                     <div id="menu-10" class="tools__menu">
-                        <div data-tool="BezierTool"  data-action="bezierToolBezier">
+                        <!-- <div data-tool="BezierTool"  data-action="bezierTool" > -->
+                        <div >
                             <img src="./assets/icons/bezier.svg" alt="">
                             <div class="tools__tooltip">
                                 <div class="tools__tooltip-triangle"></div>
-                                <div class="tools__tooltip-content">Bezier</div>
+                                <div class="tools__tooltip-content">Coming SOON</div>
                             </div>
                         </div>
-                        <div data-tool="BezierTool"  data-action="bezierToolQuadriatic">
+                        <!-- <div data-tool="BezierTool"  data-action="quadriaticTool"> -->
+                        <div >
                             <img src="./assets/icons/quadriatic.svg" alt="">
                             <div class="tools__tooltip">
                                 <div class="tools__tooltip-triangle"></div>
-                                <div class="tools__tooltip-content">Quadriatic</div>
+                                <div class="tools__tooltip-content">Coming SOON</div>
                             </div>
                         </div>
                     </div>
@@ -334,7 +336,7 @@
                     <i class="fas fa-font"></i>
                     <div id="menu-12" class="tools__menu">
                         <div class="tools__global-alpha" >
-                            <input type="range" name="" id="" min="0" max="100" >
+                            <input class="--alpha" type="range" name="" id="" min="0" max="100" >
                             <div class="tools__tooltip --show">
                                 <div class="tools__tooltip-triangle"></div>
                                 <div class="tools__tooltip-content">0</div>
@@ -352,7 +354,7 @@
                     <div id="menu-13" class="tools__menu">
                         <div data-tool="ShadowTool"  data-action="shadowToolColor">
                             <i class="fas fa-tint"></i>
-                            <input type="color" name="" id="">
+                            <input class="--shadow-color"" type="color" name="" id="">
                             <div class="tools__tooltip">
                                 <div class="tools__tooltip-triangle"></div>
                                 <div class="tools__tooltip-content">Color</div>
@@ -360,7 +362,11 @@
                         </div>
                         <div data-tool="ShadowTool"  data-action="shadowToolBlur">
                             <div class="tools__shadow-blur-icon"></div>
-                            <input class="tools__shadow-size-range" type="range" name="" id="">
+                            <input class="--shadow-blur" type="range" name="" step="1" value="0" min="0" max="100" id="">
+                            <div class="tools__tooltip --show --blur">
+                                <div class="tools__tooltip-triangle"></div>
+                                <div class="tools__tooltip-content --wide-state">0</div>
+                            </div>
                             <div class="tools__tooltip">
                                 <div class="tools__tooltip-triangle"></div>
                                 <div class="tools__tooltip-content">Blur</div>
@@ -368,7 +374,7 @@
                         </div>
                     </div>
                 </div>
-                <div data-tool="rubberTool" data-tool="RubberTool"  data-action="rubberTool" class="tools__rubber">
+                <div data-tool="RubberTool" data-tool="RubberTool"  data-action="rubberTool" class="tools__rubber">
                     <i class="fas fa-eraser"></i>
                 </div>
                 <div class="tools__active-tool">

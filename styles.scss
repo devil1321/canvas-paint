@@ -231,7 +231,7 @@
                     & > .tools__canvas-size-range{
                         opacity:1;
                     }
-                    & > .tools__shadow-size-range{
+                    & > .--shadow-blur{
                         opacity:1;
                     }
                 }
@@ -388,11 +388,14 @@
         border-radius: 100%;
         filter:blur(2px);
     }
-    &__shadow-size-range{
+    .--shadow-blur{
         display: block;
         position:absolute;
         top:50px;
         opacity:0;
+    }
+    &__tooltip.--show.--blur{
+        top:80px !important;
     }
     &__alpha,
     &__rubber{
@@ -474,6 +477,7 @@
             }
         }
     }
+  
     &__rubber{
         min-width: 95%;
        

@@ -310,7 +310,7 @@
   opacity: 1;
 }
 
-.tools__menu > div:hover > .tools__shadow-size-range {
+.tools__menu > div:hover > .--shadow-blur {
   opacity: 1;
 }
 
@@ -469,11 +469,15 @@
           filter: blur(2px);
 }
 
-.tools__shadow-size-range {
+.tools .--shadow-blur {
   display: block;
   position: absolute;
   top: 50px;
   opacity: 0;
+}
+
+.tools__tooltip.--show.--blur {
+  top: 80px !important;
 }
 
 .tools__alpha .tools__tooltip-left, .tools__rubber .tools__tooltip-left {
